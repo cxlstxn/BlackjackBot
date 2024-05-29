@@ -353,8 +353,8 @@ async def leaderboard(ctx):
 
 @client.command()
 async def collectpay(ctx):
-    connection = database.connect()
-    database.create_tables(connection)
+    connection = database.connect() 
+    database.create_tables(connection) 
     def namecheck():
         names = database.get_all_names(connection)
         for i in names:
@@ -371,7 +371,7 @@ async def collectpay(ctx):
     today = datetime.datetime.now()
     time = today-lastpayed
     hours = time.total_seconds()/3600
-    pay = int(hours*10000)
+    pay = int(hours*10000) ## Change this if you want to change the pay rate.
     balance += pay
     database.set_balance(connection, name, balance)
     database.set_last_payed(connection, name, today)
