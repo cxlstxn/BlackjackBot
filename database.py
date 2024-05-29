@@ -124,6 +124,3 @@ def get_last_payed(connection, name):
 def set_last_payed(connection, name, time):
     with connection:
         connection.execute('UPDATE users SET lastpayed = ? WHERE username = ?', (time, name))
-
-
-# test change
