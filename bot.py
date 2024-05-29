@@ -386,6 +386,3 @@ async def on_ready() -> None:
 
 
 client.run(TOKEN)
-
-
-testball
