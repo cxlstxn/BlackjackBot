@@ -1,4 +1,4 @@
-Blackjack Bot
+Blackjack Bot,
 A discord bot built for simple blackjack and coinflip games
 
 Setup:
