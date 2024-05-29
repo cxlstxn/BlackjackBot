@@ -2,10 +2,9 @@ Blackjack Bot
 A discord bot built for simple blackjack and coinflip games
 
 Setup:
-1. Inside the bots directory you must create an empty folder, "data".
-2. in the .env file you must paste in your own discord bots token.
-3. you must install dotenv and discord using pip install.
-4. to turn the bot on you can run the bot.py script
+1. in the .env file you must paste in your own discord bots token.
+2. you must install dotenv and discord using pip install.
+3. to turn the bot on you can run the bot.py script
 
 Command List:
 - ?bj {BET} ## Blackjack command, bot replies with a discord embed where the user can select Hit or Stick, other users cannot press these buttons. Bet must be > 0 

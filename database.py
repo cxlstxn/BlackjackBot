@@ -6,7 +6,7 @@ INSERT_ROW = 'INSERT INTO users(username, balance, playertotal, dealertotal, pla
 GET_ALL_NAMES = 'SELECT username FROM users;'
 
 def connect():
-    return sqlite3.connect('data/data.db')
+    return sqlite3.connect('data.db')
 
 def create_tables(connection):
     with connection:
