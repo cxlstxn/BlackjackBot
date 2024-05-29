@@ -276,6 +276,7 @@ async def m(ctx):
     embed=discord.Embed(title="Balance", description=" ", color=0x000000)
     embed.set_author(name=str(ctx.author))
     connection = database.connect()
+    database.create_tables(connection)
     found = False
     name = str(ctx.author)
     names = database.get_all_names(connection)
@@ -353,7 +354,17 @@ async def leaderboard(ctx):
 @client.command()
 async def collectpay(ctx):
     connection = database.connect()
+    database.create_tables(connection)
+    def namecheck():
+        names = database.get_all_names(connection)
+        for i in names:
+            if (i[0]) == ctx.author.name:
+                return True
+        return False
     name = ctx.author.name
+    exists = namecheck()
+    if exists == False:
+        database.add_row(connection, name)
     balance = database.get_balance(connection, name)
     lastpayed = database.get_last_payed(connection, name)
     lastpayed = datetime.datetime.strptime(lastpayed, '%Y-%m-%d %H:%M:%S.%f')
