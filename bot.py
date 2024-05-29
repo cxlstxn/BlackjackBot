@@ -336,19 +336,6 @@ async def cf(ctx,*args):
     database.set_balance(connection, name, balance)
 
 @client.command()
-async def give(ctx,*args):
-    connection = database.connect()
-    database.create_tables(connection)
-    if ctx.author.name == "cxlstxn":
-        name = args[0]
-        bal = database.get_balance(connection, name)
-        bal = bal + int(args[1])
-        database.set_balance(connection, name, bal)
-        await ctx.send( ""+name + "** was given **" + args[1] + "** dollars**")
-    else:
-        await ctx.send("**you aint him pal**")
-
-@client.command()
 async def leaderboard(ctx):
     connection = database.connect()
     database.create_tables(connection)
@@ -382,7 +369,5 @@ async def collectpay(ctx):
 @client.event
 async def on_ready() -> None:
     print(f'{client.user} is now running!')
-
-
 
 client.run(TOKEN)
