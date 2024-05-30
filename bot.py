@@ -126,6 +126,11 @@ async def bj(ctx, *args):
 
     async def stick(): ## Function to stick
         dt = database.get_dealer_total(connection, name)
+        cards = database.get_dealer_cards(connection, name)
+        twoace = False
+        if cards == "A,A":
+            twoace = True
+            dt = 12
         while dt < 17:
             xt,xcard = dealcard()
             dt += xt
@@ -138,6 +143,8 @@ async def bj(ctx, *args):
         if dt > 21:
             acecount = 0
             timesaceplayed = database.get_ace_count(connection, name)
+            if twoace == True:
+                timesaceplayed += 1
             cards = cards.split(",")
             for i in range(len(cards)):
                 if "A" in cards[i]:
