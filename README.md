@@ -3,7 +3,7 @@ A discord bot built for simple blackjack and coinflip games
 
 Setup:
 1. in the .env file you must paste in your own discord bots token.
-2. you must install dotenv and discord using pip install.
+2. pip install discord.py python-dotenv
 3. to turn the bot on you can run the bot.py script
 
 Command List:
