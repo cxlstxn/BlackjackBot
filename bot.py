@@ -1,3 +1,6 @@
+
+## Imports
+
 import discord
 from discord.ext import commands
 from typing import Final
@@ -7,22 +10,40 @@ import database
 import random
 import datetime
 
+## loading and reading the token from the .env file
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 
+## Bot and intents setup
 intents = discord.Intents.default()
 intents.message_content = True
 client = commands.Bot(command_prefix='?', intents=intents)
 
+## Functions
+
+## name check to see if the user is in the database
+def namecheck(name, connection):
+        names = database.get_all_names(connection)
+        for i in names:
+            if (i[0]) == name:
+                return True
+        return False
+
+## check if the user is in the database and if not add them
+def existscheck(exists, connection, name):
+    if exists == False:
+        database.add_row(connection, name)
+
+## Blackjack Command
 @client.command()
 async def bj(ctx, *args):
-
     connection = database.connect()
     database.create_tables(connection)
+    name = str(ctx.author.name)
     cards = ["2","3","4","5","6","7","8","9","10","K","Q","J","A"]
     suits = ["♤","♧","♡","♢"]
 
-    async def printcards(n, final):
+    async def printcards(n, final): ## Function to print cards
         embed=discord.Embed(title="Blackjack", description=" ", color=0x000000)
         embed.set_author(name=str(ctx.author))
         
@@ -59,7 +80,7 @@ async def bj(ctx, *args):
         if final == False: 
             await sendbuttons(ctx)
 
-    def getd2value(dd2):
+    def getd2value(dd2): ## Function to get the value of the second dealer card as it should be hidden
         if dd2 == "K" or dd2 == "Q" or dd2 == "J":
             return 10
         if dd2 == "A":
@@ -67,14 +88,14 @@ async def bj(ctx, *args):
         else:
             return int(dd2)
     
-    def activecheck(name):
+    def activecheck(name): ## Function to check if the game is active
         active = database.get_active(connection, name)
         if active == "True":
             return True
         else:
             return False
         
-    def dealcard():
+    def dealcard(): ## Function to deal a card
         total = 0
         card = cards[random.randint(0, len(cards)-1)]
         if (card == "A"):
@@ -85,7 +106,7 @@ async def bj(ctx, *args):
             total = int(card)
         return total,card
     
-    def dealcards():
+    def dealcards(): ## Function to deal the first two cards
         total = 0
         firstcard = cards[random.randint(0,len(cards)-1)]
         if (firstcard == "K") or (firstcard == "Q") or (firstcard == "J"):
@@ -102,19 +123,8 @@ async def bj(ctx, *args):
         else:
             total += int(secondcard)
         return total, firstcard, secondcard
-    
-    def namecheck(name):
-        names = database.get_all_names(connection)
-        for i in names:
-            if (i[0]) == name:
-                return True
-        return False
-        
-    def getName():
-        name = ctx.author.name
-        return name
 
-    async def stick():
+    async def stick(): ## Function to stick
         dt = database.get_dealer_total(connection, name)
         while dt < 17:
             xt,xcard = dealcard()
@@ -169,7 +179,7 @@ async def bj(ctx, *args):
                 database.set_balance(connection, name, balance + bet)
                 database.set_game_active(connection, name, "False")
 
-    async def hit():
+    async def hit(): ## Function to hit
         xt,xcard = dealcard()
         total = database.get_player_total(connection, name)
         total += xt
@@ -204,7 +214,7 @@ async def bj(ctx, *args):
             await printcards(name, False)
                 
 
-    class MyView(discord.ui.View):
+    class MyView(discord.ui.View): ## Button class
         def __init__(self):
             super().__init__()
         @discord.ui.button(label='Hit', style=discord.ButtonStyle.green)
@@ -215,7 +225,7 @@ async def bj(ctx, *args):
             else:
                 return 
         
-        @discord.ui.button(label='Stick', style=discord.ButtonStyle.red)
+        @discord.ui.button(label='Stick', style=discord.ButtonStyle.red) 
         async def stick(self, interaction: discord.Interaction, button: discord.ui.Button):
             if interaction.user == ctx.author:
                 await interaction.response.send_message("**You Stick**")
@@ -224,13 +234,11 @@ async def bj(ctx, *args):
             else:
                 return 
 
-    async def sendbuttons(ctx: discord.Interaction):
+    async def sendbuttons(ctx: discord.Interaction): ## Function to send buttons
         await ctx.send(view=MyView())
-
-    name = getName() 
-    exists = namecheck(name) 
-    if exists == False:
-        database.add_row(connection, name)
+    ## Main function
+    exists = namecheck(name,connection) 
+    existscheck(exists, connection, name)
     if (len(args)) == 0:
         if activecheck(name) == False:
             await ctx.send("**Provide a bet amount**")
@@ -271,14 +279,16 @@ async def bj(ctx, *args):
     database.set_ace_count(connection, name, 0)
     await printcards(name, False)
 
+
+## Balance Command
 @client.command()
-async def m(ctx):
+async def m(ctx): 
     embed=discord.Embed(title="Balance", description=" ", color=0x000000)
     embed.set_author(name=str(ctx.author))
     connection = database.connect()
     database.create_tables(connection)
     found = False
-    name = str(ctx.author)
+    name = str(ctx.author.name)
     names = database.get_all_names(connection)
     for i in names:
         if (i[0]) == name:
@@ -289,24 +299,14 @@ async def m(ctx):
     embed.add_field(name="$ "+str(balance), value="",inline=False)
     await ctx.send(embed=embed)
     
+## Coinflip Command
 @client.command()
 async def cf(ctx,*args):
     connection = database.connect()
     database.create_tables(connection)
-    def namecheck(name):
-        names = database.get_all_names(connection)
-        for i in names:
-            if (i[0]) == name:
-                return True
-        return False
-        
-    def getName():
-        name = ctx.author.name
-        return name
-    name = getName()
-    exists = namecheck(name)
-    if exists == False:
-        database.add_row(connection, name)
+    name = str(ctx.author.name)
+    exists = namecheck(name,connection)
+    existscheck(exists, connection, name)
     if len(args) == 0:
         await ctx.send("**Provide a colour and bet amount**")
         return
@@ -336,6 +336,7 @@ async def cf(ctx,*args):
         await ctx.send("**You lose**")
     database.set_balance(connection, name, balance)
 
+## leaderboard command
 @client.command()
 async def leaderboard(ctx):
     connection = database.connect()
@@ -351,20 +352,14 @@ async def leaderboard(ctx):
         embed.add_field(name=str(i+1) + ". " + leaderboard[i][0], value="$ "+str(leaderboard[i][1]), inline=False)
     await ctx.send(embed=embed)
 
+## Collectpay command
 @client.command()
 async def collectpay(ctx):
-    connection = database.connect() 
-    database.create_tables(connection) 
-    def namecheck():
-        names = database.get_all_names(connection)
-        for i in names:
-            if (i[0]) == ctx.author.name:
-                return True
-        return False
-    name = ctx.author.name
-    exists = namecheck()
-    if exists == False:
-        database.add_row(connection, name)
+    connection = database.connect()
+    database.create_tables(connection)
+    name = str(ctx.author.name)
+    exists = namecheck(name,connection)
+    existscheck(exists, connection, name)
     balance = database.get_balance(connection, name)
     lastpayed = database.get_last_payed(connection, name)
     lastpayed = datetime.datetime.strptime(lastpayed, '%Y-%m-%d %H:%M:%S.%f')
@@ -376,6 +371,18 @@ async def collectpay(ctx):
     database.set_balance(connection, name, balance)
     database.set_last_payed(connection, name, today)
     await ctx.send("You have collected $ " + str(pay))
+
+## Help command
+@client.command()
+async def helpme(ctx):
+    embed=discord.Embed(title="Help", description=" ", color=0x000000)
+    embed.set_author(name=" ")
+    embed.add_field(name="?m", value="Check your balance", inline=False)
+    embed.add_field(name="?bj [BET]", value="Play a game of blackjack", inline=False)
+    embed.add_field(name="?cf [COLOR] [BET]", value="Play a game of coinflip", inline=False)
+    embed.add_field(name="?leaderboard", value="Check the leaderboard", inline=False)
+    embed.add_field(name="?collectpay", value="Collect your pay", inline=False)
+    await ctx.send(embed=embed)
 
 @client.event
 async def on_ready() -> None:

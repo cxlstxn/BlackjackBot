@@ -12,3 +12,4 @@ Command List:
 - ?m ## Balance command, shows the users balance within a discord embed
 - ?collectpay ## Collect Pay command, users can collect a payment of money, this defaults at 10000/h but can be configured in bot.py
 - ?leaderboard ## Leaderboard command, Lists out the users that have interacted with the bot and puts them in order
+- ?helpme ## Help command, Lists out commands
